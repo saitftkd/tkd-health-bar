@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TKD Arcade Health Bar Overlay</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="overlay">
+
+  <div class="top-row">
+    <div class="corner red-corner">RED CORNER</div>
+    <div class="title">TAEKWON-DO BATTLE</div>
+    <div class="corner blue-corner">BLUE CORNER</div>
+  </div>
+
+  <div class="health-row">
+    <div class="health-box">
+      <div class="health-label">RED</div>
+      <div class="health-frame">
+        <div id="redHealth" class="health red-health"></div>
+      </div>
+      <div id="redText" class="health-text">100%</div>
+    </div>
+
+    <div class="vs">VS</div>
+
+    <div class="health-box">
+      <div class="health-label">BLUE</div>
+      <div class="health-frame">
+        <div id="blueHealth" class="health blue-health"></div>
+      </div>
+      <div id="blueText" class="health-text">100%</div>
+    </div>
+  </div>
+
+  <div id="koSign" class="ko hidden">KO!</div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCM0vaOpikhl3LmEGQVx-6sGgyq_XvIz-g",
+  authDomain: "taekwondo-projectx.firebaseapp.com",
+  databaseURL: "https://taekwondo-projectx-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "taekwondo-projectx",
+  storageBucket: "taekwondo-projectx.firebasestorage.app",
+  messagingSenderId: "538355822474",
+  appId: "1:538355822474:web:253c1bf7092207d6b2a273",
+  measurementId: "G-Z3WF3BM6PE"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const gameRef = ref(db, "tkdGame");
+
+  onValue(gameRef, (snapshot) => {
+    const data = snapshot.val();
+
+    if (!data) return;
+
+    const red = data.redHealth ?? 100;
+    const blue = data.blueHealth ?? 100;
+
+    document.getElementById("redHealth").style.width = red + "%";
+    document.getElementById("blueHealth").style.width = blue + "%";
+
+    document.getElementById("redText").innerText = red + "%";
+    document.getElementById("blueText").innerText = blue + "%";
+
+    const koSign = document.getElementById("koSign");
+
+    if (red <= 0 || blue <= 0) {
+      koSign.classList.remove("hidden");
+    } else {
+      koSign.classList.add("hidden");
+    }
+  });
+</script>
+
+</body>
+</html>
