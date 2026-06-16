@@ -2,9 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
   <title>TKD Health Bar Controller</title>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -37,12 +35,12 @@
       font-weight: bold;
     }
 
-    .teamBlue {
+    .red {
       background: #3399ff;
       color: white;
     }
 
-    .teamRed {
+    .blue {
       background: #ff3333;
       color: white;
     }
@@ -57,178 +55,119 @@
       color: black;
     }
 
-    .switch {
-      background: #b366ff;
-      color: white;
-    }
-
-    #colourStatus {
-      font-size: 16px;
-      color: #ddd;
-      margin-top: 10px;
+    .ko {
+      background: gold;
+      color: black;
     }
   </style>
 </head>
-
 <body>
 
-  <h1>Health Bar Controller -- RING 1</h1>
+<h1>Health Bar Controller -- RING 1</h1>
 
-  <div class="section">
-    <h2>BLUE CONTROLS</h2>
-    <p>Blue health will be controlled</p>
-    <button id="blueMinusBtn" class="teamBlue" onclick="scoreRed(+1)">Blue -1</button>
-    <button id="bluePlusBtn" class="teamBlue" onclick="scoreRed(-1)">Blue +1</button>
-  </div>
+<div class="section">
+  <h2>BLUE CONTROLS</h2>
+  <p>Blue health will be controlled</p>
+  <button class="red" onclick="scoreRed(+1)">Blue -1</button>
+  <button class="red" onclick="scoreRed(-1)">Blue +1</button>
+</div>
 
-  <div class="section">
-    <h2>RED CONTROLS</h2>
-    <p>Red health will be controlled</p>
-    <button id="redMinusBtn" class="teamRed" onclick="scoreBlue(+1)">Red -1</button>
-    <button id="redPlusBtn" class="teamRed" onclick="scoreBlue(-1)">Red +1</button>
-  </div>
+<div class="section">
+  <h2>RED CONTROLS</h2>
+  <p>Red health will be controlled</p>
+  <button class="blue" onclick="scoreBlue(+1)">Red -1</button>
+  <button class="blue" onclick="scoreBlue(-1)">Red +1</button>
+</div>
 
-  <div class="section">
-    <button class="switch" onclick="switchColours()">SWITCH COLOURS</button>
-    <p id="colourStatus">Colours: normal. Scoring is unchanged.</p>
+<div class="section">
+  <button class="undo" onclick="undo()">UNDO</button>
+  <button class="reset" onclick="resetGame()">RESET</button>
+</div>
 
-    <button class="undo" onclick="undo()">UNDO</button>
-    <button class="reset" onclick="resetGame()">RESET</button>
-  </div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyCM0vaOpikhl3LmEGQVx-6sGgyq_XvIz-g",
+  authDomain: "taekwondo-projectx.firebaseapp.com",
+  databaseURL: "https://taekwondo-projectx-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "taekwondo-projectx",
+  storageBucket: "taekwondo-projectx.firebasestorage.app",
+  messagingSenderId: "538355822474",
+  appId: "1:538355822474:web:253c1bf7092207d6b2a273",
+  measurementId: "G-Z3WF3BM6PE"
+};
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCM0vaOpikhl3LmEGQVx-6sGgyq_XvIz-g",
-      authDomain: "taekwondo-projectx.firebaseapp.com",
-      databaseURL: "https://taekwondo-projectx-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "taekwondo-projectx",
-      storageBucket: "taekwondo-projectx.firebasestorage.app",
-      messagingSenderId: "538355822474",
-      appId: "1:538355822474:web:253c1bf7092207d6b2a273",
-      measurementId: "G-Z3WF3BM6PE"
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const gameRef = ref(db, "tkdGame");
+
+  async function getGame() {
+    const snapshot = await get(gameRef);
+    return snapshot.val() || {
+      redHealth: 100,
+      blueHealth: 100,
+      history: []
     };
+  }
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const gameRef = ref(db, "tkdGame");
+  async function saveGame(game) {
+    await set(gameRef, game);
+  }
 
-    async function getGame() {
-      const snapshot = await get(gameRef);
-      const game = snapshot.val() || {};
+  window.scoreRed = async function(points) {
+    const game = await getGame();
 
-      return {
-        redHealth: typeof game.redHealth === "number" ? game.redHealth : 100,
-        blueHealth: typeof game.blueHealth === "number" ? game.blueHealth : 100,
-        history: Array.isArray(game.history) ? game.history : [],
-        coloursSwapped: Boolean(game.coloursSwapped)
-      };
-    }
-
-    async function saveGame(game) {
-      await set(gameRef, game);
-    }
-
-    function updateControllerColours(coloursSwapped) {
-      const blueButtons = [
-        document.getElementById("blueMinusBtn"),
-        document.getElementById("bluePlusBtn")
-      ];
-
-      const redButtons = [
-        document.getElementById("redMinusBtn"),
-        document.getElementById("redPlusBtn")
-      ];
-
-      blueButtons.forEach(button => {
-        button.classList.toggle("teamBlue", !coloursSwapped);
-        button.classList.toggle("teamRed", coloursSwapped);
-      });
-
-      redButtons.forEach(button => {
-        button.classList.toggle("teamRed", !coloursSwapped);
-        button.classList.toggle("teamBlue", coloursSwapped);
-      });
-
-      document.getElementById("colourStatus").textContent = coloursSwapped
-        ? "Colours: switched. Scoring is unchanged."
-        : "Colours: normal. Scoring is unchanged.";
-    }
-
-    onValue(gameRef, snapshot => {
-      const game = snapshot.val() || {};
-      updateControllerColours(Boolean(game.coloursSwapped));
+    game.history = game.history || [];
+    game.history.push({
+      redHealth: game.redHealth,
+      blueHealth: game.blueHealth
     });
 
-    window.switchColours = async function() {
-      const game = await getGame();
+    game.blueHealth = Math.max(0, game.blueHealth - points);
 
-      game.coloursSwapped = !game.coloursSwapped;
+    await saveGame(game);
+  }
 
-      await saveGame(game);
-    };
+  window.scoreBlue = async function(points) {
+    const game = await getGame();
 
-    window.scoreRed = async function(points) {
-      const game = await getGame();
+    game.history = game.history || [];
+    game.history.push({
+      redHealth: game.redHealth,
+      blueHealth: game.blueHealth
+    });
 
-      game.history = game.history || [];
+    game.redHealth = Math.max(0, game.redHealth - points);
 
-      game.history.push({
-        redHealth: game.redHealth,
-        blueHealth: game.blueHealth,
-        coloursSwapped: game.coloursSwapped
-      });
+    await saveGame(game);
+  }
 
-      game.blueHealth = Math.max(0, game.blueHealth - points);
+  window.undo = async function() {
+    const game = await getGame();
 
-      await saveGame(game);
-    };
+    if (!game.history || game.history.length === 0) {
+      alert("Nothing to undo");
+      return;
+    }
 
-    window.scoreBlue = async function(points) {
-      const game = await getGame();
+    const lastState = game.history.pop();
 
-      game.history = game.history || [];
+    game.redHealth = lastState.redHealth;
+    game.blueHealth = lastState.blueHealth;
 
-      game.history.push({
-        redHealth: game.redHealth,
-        blueHealth: game.blueHealth,
-        coloursSwapped: game.coloursSwapped
-      });
+    await saveGame(game);
+  }
 
-      game.redHealth = Math.max(0, game.redHealth - points);
-
-      await saveGame(game);
-    };
-
-    window.undo = async function() {
-      const game = await getGame();
-
-      if (!game.history || game.history.length === 0) {
-        alert("Nothing to undo");
-        return;
-      }
-
-      const lastState = game.history.pop();
-
-      game.redHealth = lastState.redHealth;
-      game.blueHealth = lastState.blueHealth;
-
-      await saveGame(game);
-    };
-
-    window.resetGame = async function() {
-      const game = await getGame();
-
-      await saveGame({
-        redHealth: 100,
-        blueHealth: 100,
-        history: [],
-        coloursSwapped: game.coloursSwapped
-      });
-    };
-  </script>
+  window.resetGame = async function() {
+    await saveGame({
+      redHealth: 100,
+      blueHealth: 100,
+      history: []
+    });
+  }
+</script>
 
 </body>
 </html>
