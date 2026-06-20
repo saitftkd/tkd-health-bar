@@ -144,23 +144,28 @@
   <button class="reset" onclick="resetGame()">RESET</button>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCM0vaOpikhl3LmEGQVx-6sGgyq_XvIz-g",
-  authDomain: "taekwondo-projectx.firebaseapp.com",
-  databaseURL: "https://taekwondo-projectx-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "taekwondo-projectx",
-  storageBucket: "taekwondo-projectx.firebasestorage.app",
-  messagingSenderId: "538355822474",
-  appId: "1:538355822474:web:253c1bf7092207d6b2a273",
-  measurementId: "G-Z3WF3BM6PE"
+  apiKey: "AIzaSyDImwuxwVq563KqzJFi74EFjrMOCh7ZyQs",
+  authDomain: "saitftkd-healthbar.firebaseapp.com",
+  databaseURL: "https://saitftkd-healthbar-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "saitftkd-healthbar",
+  storageBucket: "saitftkd-healthbar.firebasestorage.app",
+  messagingSenderId: "82767731529",
+  appId: "1:82767731529:web:f9396b3edaa768caa29898",
+  measurementId: "G-C2N5C6DM5Q"
 };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
   const gameRef = ref(db, "tkdGame");
 
   async function getGame() {
