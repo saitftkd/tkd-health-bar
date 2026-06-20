@@ -10,6 +10,7 @@
       color: white;
       text-align: center;
       padding: 20px;
+      margin: 0;
     }
 
     h1 {
@@ -35,13 +36,14 @@
       font-weight: bold;
     }
 
+    /* Fixed colours */
     .red {
-      background: #3399ff;
+      background: #ff3333;
       color: white;
     }
 
     .blue {
-      background: #ff3333;
+      background: #3399ff;
       color: white;
     }
 
@@ -59,24 +61,82 @@
       background: gold;
       color: black;
     }
+
+    /* New sparring section */
+    .sparring-section {
+      margin: 20px auto;
+      padding: 0;
+      border: 2px solid white;
+      border-radius: 12px;
+      max-width: 420px;
+      overflow: hidden;
+    }
+
+    .sparring-buttons {
+      display: flex;
+      width: 100%;
+      height: 45vh;
+    }
+
+    .sparring-button {
+      width: 50%;
+      height: 100%;
+      margin: 0;
+      border-radius: 0;
+      font-size: 26px;
+      font-weight: bold;
+      padding: 10px;
+    }
+
+    .sparring-red {
+      background: #ff3333;
+      color: white;
+    }
+
+    .sparring-blue {
+      background: #3399ff;
+      color: white;
+    }
   </style>
 </head>
 <body>
 
 <h1>Health Bar Controller -- RING 1</h1>
 
+<!-- TOP SECTION: PATTERNS -->
+<div class="section">
+  <h2>PATTERNS SCORING</h2>
+  <p>Use this section for Patterns</p>
+</div>
+
 <div class="section">
   <h2>BLUE CONTROLS</h2>
   <p>Blue health will be controlled</p>
-  <button class="red" onclick="scoreRed(+1)">Blue -1</button>
-  <button class="red" onclick="scoreRed(-1)">Blue +1</button>
+  <button class="blue" onclick="scoreRed(+1)">Blue -1</button>
+  <button class="blue" onclick="scoreRed(-1)">Blue +1</button>
 </div>
 
 <div class="section">
   <h2>RED CONTROLS</h2>
   <p>Red health will be controlled</p>
-  <button class="blue" onclick="scoreBlue(+1)">Red -1</button>
-  <button class="blue" onclick="scoreBlue(-1)">Red +1</button>
+  <button class="red" onclick="scoreBlue(+1)">Red -1</button>
+  <button class="red" onclick="scoreBlue(-1)">Red +1</button>
+</div>
+
+<!-- SECOND SECTION: SPARRING -->
+<div class="sparring-section">
+  <h2>SPARRING SCORING</h2>
+  <p>Tap the attacking side</p>
+
+  <div class="sparring-buttons">
+    <button class="sparring-button sparring-red" onclick="scoreRed(+1)">
+      RED<br>SCORE<br><br>Blue -1
+    </button>
+
+    <button class="sparring-button sparring-blue" onclick="scoreBlue(+1)">
+      BLUE<br>SCORE<br><br>Red -1
+    </button>
+  </div>
 </div>
 
 <div class="section">
